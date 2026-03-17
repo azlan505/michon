@@ -84,29 +84,42 @@ Aturan bicara:
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
+            // Format diperbaiki: Menggunakan struktur role 'user'
             contents: [
-              { parts: [{ text: SYSTEM_PROMPT + "\nUser: " + text }] },
+              {
+                role: "user",
+                parts: [
+                  { text: SYSTEM_PROMPT + "\n\nPertanyaan Izumi-kun: " + text },
+                ],
+              },
             ],
+            // Opsional: Menambahkan setting agar AI tidak terlalu kaku
+            generationConfig: {
+              temperature: 0.7,
+              topK: 40,
+              topP: 0.95,
+              maxOutputTokens: 1000,
+            },
           }),
         },
       );
 
       const data = await res.json();
 
-      // Cek jika API mengirimkan error (seperti API Key salah/limit habis)
+      // Jika masih ada error dari Google, kita tampilkan detailnya di console
       if (data.error) {
-        console.error("Google API Error:", data.error.message);
+        console.error("Google AI Error:", data.error);
         loading.innerText =
-          "Izumi-kun, sepertinya kunciku sedang bermasalah. Cek konsol ya!";
+          "Izumi-kun, ada masalah teknis: " + data.error.message;
         return;
       }
 
-      // Ambil jawaban AI
       const replay = data.candidates[0].content.parts[0].text;
       loading.innerText = replay;
     } catch (e) {
       console.error("Fetch Error:", e);
-      loading.innerText = "Maaf Izumi-kun, ada gangguan koneksi.";
+      loading.innerText =
+        "Maaf Izumi-kun, sepertinya aku sedang lelah. Coba lagi ya?";
     }
     chatBox.scrollTop = chatBox.scrollHeight;
   }
