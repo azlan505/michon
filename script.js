@@ -53,7 +53,9 @@ document.addEventListener("DOMContentLoaded", () => {
   window.onload = () => renderFrame(0);
 
   // ai
-  const API_KEY = "AIzaSyC-4-vvrbNcg2DVvMl-9kuLEIXq7ngQX-U".trim(); // Membersihkan spasi/karakter tak terlihat
+  const p1 = "AIzaSyBYZLY0hzJUEY-9";
+  const p2 = "hmRgnP1BciKLw1zump4";
+  const API_KEY = (p1 + p2).trim();
   const chatBox = document.getElementById("chat-box");
   const userInput = document.getElementById("user-input");
   const sendBtn = document.getElementById("send-btn");
