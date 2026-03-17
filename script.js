@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
   window.onload = () => renderFrame(0);
 
   // ai
-  const API_KEY = "AIzaSyC-4-vvrbNcg2DVvMl-9kuLEIXq7ngQX-U";
+  const API_KEY = "AIzaSyC-4-vvrbNcg2DVvMl-9kuLEIXq7ngQX-U".trim(); // Membersihkan spasi/karakter tak terlihat
   const chatBox = document.getElementById("chat-box");
   const userInput = document.getElementById("user-input");
   const sendBtn = document.getElementById("send-btn");
@@ -88,21 +88,35 @@ Aturan bicara:
           }),
         },
       );
+
       const data = await res.json();
+
+      // Cek jika API mengirimkan error (seperti API Key salah/limit habis)
+      if (data.error) {
+        console.error("Google API Error:", data.error.message);
+        loading.innerText =
+          "Izumi-kun, sepertinya kunciku sedang bermasalah. Cek konsol ya!";
+        return;
+      }
+
+      // Ambil jawaban AI
       const replay = data.candidates[0].content.parts[0].text;
       loading.innerText = replay;
     } catch (e) {
+      console.error("Fetch Error:", e);
       loading.innerText = "Maaf Izumi-kun, ada gangguan koneksi.";
     }
     chatBox.scrollTop = chatBox.scrollHeight;
   }
 
   sendBtn.addEventListener("click", () => {
-    if (!userInput.value) return;
+    if (!userInput.value.trim()) return;
+
     const msg = document.createElement("div");
     msg.className = "user-msg";
     msg.innerText = userInput.value;
     chatBox.appendChild(msg);
+
     const val = userInput.value;
     userInput.value = "";
     getResponse(val);
