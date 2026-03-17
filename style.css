@@ -318,7 +318,7 @@ h2 {
 
 
 
-/* AI */
+/* --- AI SECTION CONTAINER --- */
 .ai-section {
   display: flex;
   height: 600px; 
@@ -327,7 +327,7 @@ h2 {
   overflow: hidden;
 }
 
-/* SISI KIRI */
+/* --- SISI KIRI (GAMBAR SHIKIMORI) --- */
 .ai-image-side {
   flex: 1;
   display: flex;
@@ -342,17 +342,92 @@ h2 {
   max-height: 90%;
   object-fit: contain;
   filter: drop-shadow(0 0 20px rgba(255, 136, 160, 0.3));
+  transition: transform 0.3s ease;
 }
 
-/* SISI KANAN */
+/* --- SISI KANAN (AREA CHAT) --- */
 .ai-chat-side {
   flex: 1;
   display: flex;
   flex-direction: column;
   border-left: 1px solid #111;
   background: #080808;
+  position: relative; /* Penting untuk posisi overlay */
+  overflow: hidden;
 }
 
+/* --- OVERLAY FORM NAMA --- */
+.chat-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(5, 5, 5, 0.85);
+  backdrop-filter: blur(15px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  transition: opacity 0.5s ease, visibility 0.5s;
+}
+
+.overlay-content {
+  background: #0a0a0a;
+  padding: 30px;
+  border-radius: 8px;
+  border: 1px solid var(--primary);
+  text-align: center;
+  box-shadow: 0 0 25px rgba(255, 136, 160, 0.15);
+  width: 80%;
+  max-width: 300px;
+}
+
+.overlay-content h3 {
+  color: #fff;
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+}
+
+#initial-name {
+  width: 100%;
+  background: #000;
+  border: 1px solid #222;
+  padding: 12px;
+  color: white;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  outline: none;
+  text-align: center;
+}
+
+#initial-name:focus { border-color: var(--primary); }
+
+#start-chat-btn {
+  background: var(--primary);
+  color: var(--bg-dark);
+  border: none;
+  padding: 10px 25px;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+  transition: 0.3s;
+}
+
+#start-chat-btn:hover {
+  background: #fff;
+  transform: scale(1.02);
+}
+
+.overlay-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* --- HEADER CHAT --- */
 .chat-header {
   padding: 30px;
   border-bottom: 1px solid #111;
@@ -371,6 +446,7 @@ h2 {
   margin: 5px 0 0 0;
 }
 
+/* --- DISPLAY PESAN --- */
 .chat-display {
   flex: 1;
   padding: 20px;
@@ -378,18 +454,21 @@ h2 {
   display: flex;
   flex-direction: column;
   gap: 15px;
+  scroll-behavior: smooth;
 }
 
-/* Scrollbar Chat */
 .chat-display::-webkit-scrollbar { width: 3px; }
 .chat-display::-webkit-scrollbar-thumb { background: var(--primary); }
 
+/* --- BUBBLE CHAT --- */
 .bot-msg, .user-msg {
   max-width: 80%;
   padding: 12px 16px;
   font-size: 0.9rem;
   line-height: 1.5;
   border-radius: 4px;
+  position: relative;
+  transition: all 0.3s ease;
 }
 
 .bot-msg {
@@ -406,6 +485,38 @@ h2 {
   border-right: 3px solid #333;
 }
 
+/* --- EFEK VISUAL KHUSUS (MOOD) --- */
+
+/* Efek Malu/Blush (Glowing Pink) */
+.bot-msg.blush {
+  border-left: 3px solid #ff69b4;
+  box-shadow: 0 0 15px rgba(255, 105, 180, 0.5);
+  background: rgba(255, 105, 180, 0.15);
+}
+
+/* Efek Cool Mode/Tegas (Glowing Purple) */
+.bot-msg.cool {
+  border-left: 3px solid #9d4edd;
+  box-shadow: 0 0 15px rgba(157, 78, 221, 0.5);
+  background: rgba(157, 78, 221, 0.15);
+}
+
+/* Animasi Getar (Shake) */
+@keyframes shake {
+  0% { transform: translate(1px, 1px) rotate(0deg); }
+  10% { transform: translate(-1px, -2px) rotate(-1deg); }
+  30% { transform: translate(3px, 2px) rotate(0deg); }
+  50% { transform: translate(-1px, 2px) rotate(1deg); }
+  70% { transform: translate(3px, 1px) rotate(-1deg); }
+  100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+
+.shake-effect {
+  animation: shake 0.4s;
+  animation-iteration-count: 2;
+}
+
+/* --- KONTROL INPUT --- */
 .chat-controls {
   padding: 20px;
   display: flex;

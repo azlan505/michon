@@ -501,46 +501,63 @@
       </div>
     </section>
 
-
     <!-- chat AI -->
-    <section class="ai" id="ai"></section>
-    <h2><SPAN>SHIKIMORI</SPAN> CHAT</h2>
-    <div class="ai-section">
-      <div class="ai-image-side">
-        <div class="image-wrapper">
-          <img src="https://path-ke-foto-shikimori.jpg" alt="Shikimori" />
-        </div>
-      </div>
 
-      <div class="ai-chat-side">
-        <div class="chat-header">
-          <h2>Talk to Shikimori</h2>
-          <p>Izumi-kun, apa ada yang ingin kamu tanyakan?</p>
-        </div>
-
-        <div id="chat-box" class="chat-display">
-          <div class="bot-msg">
-            Halo Izumi-kun! Aku di sini bersamamu. Ada yang bisa aku bantu?
+    <section class="ai" id="ai">
+      <h2><span>SHIKIMORI</span> CHAT</h2>
+      <div class="ai-section">
+        <div class="ai-image-side">
+          <div class="image-wrapper">
+            <img
+              id="shikimori-img"
+              src="URL_NETRAL.jpg"
+              alt="Shikimori"
+              data-netral="URL_NETRAL.jpg"
+              data-senang="URL_SENANG.jpg"
+              data-malu="URL_MALU.jpg"
+              data-marah="URL_MARAH_COOL.jpg"
+              data-sedih="URL_SEDIH.jpg"
+            />
           </div>
         </div>
 
-        <div class="chat-controls">
-          <input
-            type="text"
-            id="user-input"
-            placeholder="Ketik pesan..."
-            autocomplete="off"
-          />
-          <button id="send-btn">
-            <svg viewBox="0 0 24 24" width="24" height="24">
-              <path
-                fill="currentColor"
-                d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"
+        <div class="ai-chat-side" style="position: relative">
+          <div id="name-overlay" class="chat-overlay">
+            <div class="overlay-content">
+              <h3>Siapa namamu?</h3>
+              <input
+                type="text"
+                id="initial-name"
+                placeholder="Panggil aku..."
+                autocomplete="off"
               />
-            </svg>
-          </button>
+              <button id="start-chat-btn">Masuk</button>
+            </div>
+          </div>
+
+          <div class="chat-header">
+            <h2>Talk to Shikimori</h2>
+          </div>
+
+          <div id="chat-box" class="chat-display"></div>
+
+          <div class="chat-controls">
+            <input
+              type="text"
+              id="user-input"
+              placeholder="Ketik pesan..."
+              autocomplete="off"
+            />
+            <button id="send-btn">
+              <svg viewBox="0 0 24 24" width="24" height="24">
+                <path
+                  fill="currentColor"
+                  d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
-      </div>
       </div>
     </section>
 

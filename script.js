@@ -52,92 +52,237 @@ document.addEventListener("DOMContentLoaded", () => {
   // Tampilkan frame pertama saat load
   window.onload = () => renderFrame(0);
 
-  // ai
-  const p1 = "AIzaSyBYZLY0hzJUEY-9";
-  const p2 = "hmRgnP1BciKLw1zump4";
-  const API_KEY = (p1 + p2).trim();
-  const chatBox = document.getElementById("chat-box");
-  const userInput = document.getElementById("user-input");
-  const sendBtn = document.getElementById("send-btn");
+  // --- BAGIAN AI SHIKIMORI ---
+  // Gunakan window.onload agar benar-benar memastikan semua elemen HTML terbaca
+  window.onload = () => {
+    // 1. DATA USER & API
+    let userName = "Izumi";
+    const p1 = "AIzaSyBYZLY0hzJUEY-9";
+    const p2 = "hmRgnP1BciKLw1zump4";
+    const API_KEY = (p1 + p2).trim();
 
-  const SYSTEM_PROMPT = `
-Kamu adalah Shikimori Micchon dari anime "Shikimori's Not Just a Cutie". 
-Sifatmu: Sangat manis, penyayang, tapi bisa menjadi sangat keren dan protektif (cool mode) jika seseorang menyakiti Izumi-kun.
-Aturan bicara:
-1. Panggil user dengan sebutan "Izumi-kun".
-2. Gunakan bahasa yang sopan tapi akrab.
-3. Jika user bertanya hal teknis, jawablah sambil tetap berakting sebagai Shikimori.
-4. Jangan pernah mengaku sebagai AI atau model bahasa dari Google.
-`;
+    // 2. SELEKSI ELEMEN
+    const overlay = document.getElementById("name-overlay");
+    const initialNameInput = document.getElementById("initial-name");
+    const startChatBtn = document.getElementById("start-chat-btn");
+    const chatBox = document.getElementById("chat-box");
+    const userInput = document.getElementById("user-input");
+    const sendBtn = document.getElementById("send-btn");
 
-  async function getResponse(text) {
-    const loading = document.createElement("div");
-    loading.className = "bot-msg";
-    loading.innerText = "...";
-    chatBox.appendChild(loading);
-    chatBox.scrollTop = chatBox.scrollHeight;
+    // Debugging: Cek di Console (F12) apakah tombol terbaca
+    console.log("Shikimori Chat Ready. Tombol Start:", startChatBtn);
 
-    try {
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            // Format diperbaiki: Menggunakan struktur role 'user'
-            contents: [
-              {
-                role: "user",
-                parts: [
-                  { text: SYSTEM_PROMPT + "\n\nPertanyaan Izumi-kun: " + text },
-                ],
-              },
-            ],
-            // Opsional: Menambahkan setting agar AI tidak terlalu kaku
-            generationConfig: {
-              temperature: 0.7,
-              topK: 40,
-              topP: 0.95,
-              maxOutputTokens: 1000,
-            },
-          }),
-        },
-      );
+    // 3. LOGIKA TOMBOL MASUK (OVERLAY)
+    if (startChatBtn) {
+      startChatBtn.onclick = () => {
+        const val = initialNameInput.value.trim();
+        if (val) {
+          userName = val.split(" ")[0]; // Ambil nama depan
+          userName = userName.charAt(0).toUpperCase() + userName.slice(1);
+        }
 
-      const data = await res.json();
+        // Sembunyikan Overlay
+        if (overlay) {
+          overlay.classList.add("overlay-hidden");
+          console.log("Overlay disembunyikan untuk:", userName);
+        }
 
-      // Jika masih ada error dari Google, kita tampilkan detailnya di console
-      if (data.error) {
-        console.error("Google AI Error:", data.error);
-        loading.innerText =
-          "Izumi-kun, ada masalah teknis: " + data.error.message;
-        return;
+        // Sapaan Pertama (Natural)
+        setTimeout(() => {
+          const msg = document.createElement("div");
+          msg.className = "bot-msg";
+          msg.innerText = `Halo ${userName}-kun! Aku di sini bersamamu. Ada yang bisa aku bantu? 🌸`;
+          chatBox.appendChild(msg);
+          chatBox.scrollTop = chatBox.scrollHeight;
+        }, 500);
+      };
+    }
+
+    // Support Enter di Input Nama
+    if (initialNameInput) {
+      initialNameInput.onkeypress = (e) => {
+        if (e.key === "Enter") startChatBtn.click();
+      };
+    }
+
+    // 4. PROMPT SISTEM (SHIKIMORI CORE - NATURAL MODE)
+    const SYSTEM_PROMPT = `
+Kamu adalah Shikimori Micchon. Kamu adalah pacar dari user ([Nama]-kun).
+GAYA BICARA:
+1. Natural & Singkat: Jangan gunakan narasi panjang atau deskripsi tindakan (seperti *aku merona*). 
+2. Ekspresi: Gunakan emoji singkat (seperti 😳, ✨, 🌸) untuk menunjukkan perasaanmu.
+3. Kepribadian: Manis dan penyayang, tapi bisa berubah jadi "Cool Mode" (tegas & protektif) jika situasi mendesak atau cemburu.
+4. Jangan mengaku AI. Bicaralah seperti pacar yang sedang chatting.
+5. Jika malu, cukup gunakan kata-kata seperti "Mou..", atau "U-un..".`;
+
+    function triggerEffects(replayText) {
+      const chatSide = document.querySelector(".ai-chat-side");
+      const lastMsg = chatBox.lastElementChild;
+      const shikimoriImg = document.getElementById("shikimori-img");
+
+      if (!lastMsg || !shikimoriImg) return;
+
+      // Ambil semua URL dari atribut data-
+      const pics = {
+        netral: shikimoriImg.getAttribute("data-netral"),
+        senang: shikimoriImg.getAttribute("data-senang"),
+        malu: shikimoriImg.getAttribute("data-malu"),
+        marah: shikimoriImg.getAttribute("data-marah"),
+        sedih: shikimoriImg.getAttribute("data-sedih"),
+      };
+
+      const text = replayText.toLowerCase();
+      let currentMood = "netral"; // Default
+
+      // --- LOGIKA DETEKSI EMOSI ---
+
+      // 1. MARAH / COOL (Glow Ungu + Getar)
+      if (
+        [
+          "siapa",
+          "jangan",
+          "berhenti",
+          "diam",
+          "berani",
+          "💢",
+          "😠",
+          "😤",
+          "cemburu",
+        ].some((w) => text.includes(w))
+      ) {
+        currentMood = "marah";
+        lastMsg.classList.add("cool");
+        chatSide.classList.remove("shake-effect");
+        void chatSide.offsetWidth;
+        chatSide.classList.add("shake-effect");
+      }
+      // 2. MALU-MALU (Glow Pink)
+      else if (
+        ["😳", "mou", "malu", "u-un", "baka", "merona"].some((w) =>
+          text.includes(w),
+        )
+      ) {
+        currentMood = "malu";
+        lastMsg.classList.add("blush");
+      }
+      // 3. SENANG / CERIA
+      else if (
+        [
+          "✨",
+          "🌸",
+          "senang",
+          "terima kasih",
+          "ehehe",
+          "bahagia",
+          "syukurlah",
+        ].some((w) => text.includes(w))
+      ) {
+        currentMood = "senang";
+      }
+      // 4. SEDIH / KHAWATIR
+      else if (
+        [
+          "maaf",
+          "sedih",
+          "hiks",
+          "kasihan",
+          "khawatir",
+          "jangan pergi",
+          "pusing",
+        ].some((w) => text.includes(w))
+      ) {
+        currentMood = "sedih";
       }
 
-      const replay = data.candidates[0].content.parts[0].text;
-      loading.innerText = replay;
-    } catch (e) {
-      console.error("Fetch Error:", e);
-      loading.innerText =
-        "Maaf Izumi-kun, sepertinya aku sedang lelah. Coba lagi ya?";
+      // GANTI FOTO SESUAI MOOD
+      shikimoriImg.style.opacity = "0"; 
+      setTimeout(() => {
+        shikimoriImg.src = pics[currentMood];
+        shikimoriImg.style.opacity = "1";
+      }, 200);
+
+      // Suara Notif
+      new Audio(
+        "https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3",
+      )
+        .play()
+        .catch(() => {});
     }
-    chatBox.scrollTop = chatBox.scrollHeight;
-  }
 
-  sendBtn.addEventListener("click", () => {
-    if (!userInput.value.trim()) return;
+    // 6. FUNGSI API GEMINI
+    async function getResponse(text) {
+      const loading = document.createElement("div");
+      loading.className = "bot-msg";
+      loading.innerText = "...";
+      chatBox.appendChild(loading);
+      chatBox.scrollTop = chatBox.scrollHeight;
 
-    const msg = document.createElement("div");
-    msg.className = "user-msg";
-    msg.innerText = userInput.value;
-    chatBox.appendChild(msg);
+      try {
+        const res = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${API_KEY}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [
+                {
+                  role: "user",
+                  parts: [
+                    {
+                      text:
+                        SYSTEM_PROMPT +
+                        `\n(Nama user: ${userName})\nUser: ${text}`,
+                    },
+                  ],
+                },
+              ],
+            }),
+          },
+        );
 
-    const val = userInput.value;
-    userInput.value = "";
-    getResponse(val);
-  });
+        const data = await res.json();
+        const replay = data.candidates[0].content.parts[0].text;
 
-  userInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") sendBtn.click();
-  });
+        // Hapus loading, ganti dengan jawaban asli
+        chatBox.removeChild(loading);
+
+        const botMsg = document.createElement("div");
+        botMsg.className = "bot-msg";
+        botMsg.innerText = replay;
+        chatBox.appendChild(botMsg);
+
+        triggerEffects(replay); 
+      } catch (e) {
+        if (loading)
+          loading.innerText =
+            "Duh, kepalaku pusing... Bisa tanya lagi nanti, " +
+            userName +
+            "-kun?";
+        console.error(e);
+      }
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // 7. EVENT SEND CHAT
+    if (sendBtn) {
+      sendBtn.onclick = () => {
+        const text = userInput.value.trim();
+        if (!text) return;
+
+        const msg = document.createElement("div");
+        msg.className = "user-msg";
+        msg.innerText = text;
+        chatBox.appendChild(msg);
+
+        userInput.value = "";
+        getResponse(text);
+      };
+    }
+
+    if (userInput) {
+      userInput.onkeypress = (e) => {
+        if (e.key === "Enter") sendBtn.click();
+      };
+    }
+  };
 });
