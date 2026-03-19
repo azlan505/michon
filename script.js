@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-
   // SCROLLING ANIMATION SHIKOMORI
   const canvas = document.getElementById("shikimori-screen");
   const context = canvas.getContext("2d");
@@ -10,7 +9,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const currentFrame = (index) =>
     `./assets/photo/scroling/frame_${index.toString().padStart(2, "0")}_delay-0.1s.jpg`;
-
 
   for (let i = 0; i < frameCount; i++) {
     const img = new Image();
@@ -45,10 +43,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   window.onload = () => renderFrame(0);
 
-
-
-
-
   //MICHON AI CHATBOT
   window.onload = () => {
     let userName = "Izumi";
@@ -65,7 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const shikimoriImg = document.getElementById("shikimori-img");
 
     // PROMPT SISTEM MICHON
-   const SYSTEM_PROMPT = `
+    const SYSTEM_PROMPT = `
 Nama: Shikimori Micchon. Peran: Pacar setia [Nama]-kun.
 Sifat: Imut, penyayang, cemburuan, tapi "Cool/Protektif" jika user sedih/terancam.
 Bicara: Akrab, manja, gunakan deskripsi tindakan (ex: *tersenyum*).
@@ -73,6 +67,7 @@ Kelemahan: Masakan sering gosong.
 WAJIB: Akhiri chat dengan satu tag: [mood:senang/malu/marah/sedih/netral] + emoji yg sesuai.
 Marah/Cool=💢, Senang=🥰/😘, Sedih=😞/😖, Malu=😳.
 JANGAN ngaku AI. JANGAN tulis instruksi teknis/drafting.
+Setiap membalas, tambahkan terjemahan singkat ucapanmu dalam bahasa Jepang di paling bawah dengan format: [ja: teks jepang di sini]. Contoh: [ja: Konnichiwa, [Nama]-kun!].
 `;
 
     // FUNGSI EFEK KHUSUS (HUJAN & GETAR)
@@ -135,7 +130,7 @@ JANGAN ngaku AI. JANGAN tulis instruksi teknis/drafting.
       chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    // LOGIKA OVERLAY & API 
+    // LOGIKA OVERLAY & API
     if (startChatBtn) {
       startChatBtn.onclick = () => {
         const val = initialNameInput.value.trim();
@@ -172,17 +167,18 @@ JANGAN ngaku AI. JANGAN tulis instruksi teknis/drafting.
                   role: "user",
                   parts: [
                     {
-                      text: SYSTEM_PROMPT + `\n(User: ${userName})\nUser: ${text}`,
+                      text:
+                        SYSTEM_PROMPT + `\n(User: ${userName})\nUser: ${text}`,
                     },
                   ],
                 },
               ],
-              generationConfig: { 
-                temperature: 1.0, 
-                topP: 0.95
+              generationConfig: {
+                temperature: 1.0,
+                topP: 0.95,
               },
             }),
-          }
+          },
         );
 
         const data = await res.json();
@@ -191,24 +187,45 @@ JANGAN ngaku AI. JANGAN tulis instruksi teknis/drafting.
         if (data.candidates && data.candidates[0]) {
           let replay = data.candidates[0].content.parts[0].text;
 
-          // Logika mood 
-          const moodMatch = replay.match(/\[mood:(\w+)\]/);
-          let detectedMood = "netral";
-
-          if (moodMatch) {
-            detectedMood = moodMatch[1];
-            replay = replay.replace(moodMatch[0], "").trim();
+          // --- LOGIKA SUARA JEPANG ---
+          const jaMatch = replay.match(/\[ja:(.*?)\]/);
+          let voiceText = "";
+          if (jaMatch) {
+            voiceText = jaMatch[1];
+            replay = replay.replace(jaMatch[0], "").trim();
           }
 
+          // --- LOGIKA MOOD ---
+          const moodMatch = replay.match(/\[mood:\s*(\w+).*?\]/);
+          let detectedMood = "netral";
+          if (moodMatch) {
+            detectedMood = moodMatch[1];
+            replay = replay.replace(/\[mood:.*?\]/g, "").trim();
+          }
+
+          // --- JALANKAN SUARA ---
+          if (voiceText) {
+            const cleanVoice = voiceText.replace(/\*.*?\*/g, "");
+            speak(cleanVoice);
+          }
+
+          // Tampilkan teks Indonesia ke layar chat
           addMessage("bot", replay, detectedMood);
         } else {
-          addMessage("bot", `Gomennasai ${userName}-kun, Michon lagi gak mood sekarang, nanti aja ya ❤️`, "sedih");
+          addMessage(
+            "bot",
+            `Gomennasai ${userName}-kun, Michon lagi gak mood sekarang, nanti aja ya ❤️`,
+            "sedih",
+          );
         }
-
       } catch (e) {
         console.error(e);
         if (chatBox.contains(loading)) chatBox.removeChild(loading);
-        addMessage("bot", `Maaf ${userName}-kun, aku capek😞, lanjut nanti ya.... Sayonara!😘`, "sedih");
+        addMessage(
+          "bot",
+          `Maaf ${userName}-kun, aku capek😞, lanjut nanti ya.... Sayonara!😘`,
+          "sedih",
+        );
       }
       chatBox.scrollTop = chatBox.scrollHeight;
     }
@@ -225,4 +242,26 @@ JANGAN ngaku AI. JANGAN tulis instruksi teknis/drafting.
       if (e.key === "Enter") sendBtn.click();
     };
   };
+
+  function speak(text) {
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    const voices = window.speechSynthesis.getVoices();
+
+    // Mencari suara Jepang
+    const shikimoriVoice =
+      voices.find((v) => v.lang === "ja-JP" && v.name.includes("Google")) ||
+      voices.find((v) => v.lang === "ja-JP" && v.name.includes("Female")) ||
+      voices.find((v) => v.lang === "ja-JP");
+
+    if (shikimoriVoice) {
+      utterance.voice = shikimoriVoice;
+    }
+
+    utterance.lang = "ja-JP";
+    utterance.pitch = 1.2;
+    utterance.rate = 1.05;
+
+    window.speechSynthesis.speak(utterance);
+  }
 });
