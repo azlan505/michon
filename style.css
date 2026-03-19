@@ -128,24 +128,29 @@ h2 {
 
 /* tentang */
 .tentang {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  position: relative;
+  display: block;
+  width: 100%;
+  background-color: var(--bg-dark);
 }
+
 .anim-wrapper {
   position: relative;
   display: flex;
-  height: 400vh;
+  min-height: 100vh;
+  height: auto;
+  align-items: flex-start;
 }
-/* kiri */
+
 .content-left {
   width: 40%;
   background-color: var(--bg-dark);
   box-shadow: 20px 0 50px rgba(0, 0, 0, 0.9);
   z-index: 10;
   position: relative;
+  padding-bottom: 100px;
 }
+
 .content-left::after {
   content: "";
   position: absolute;
@@ -153,33 +158,50 @@ h2 {
   right: -100px;
   width: 100px;
   height: 100%;
-  background: linear-gradient(to right, #010101, transparent);
+  background: linear-gradient(to right, var(--bg-dark), transparent);
   pointer-events: none;
 }
+
 .text-section {
   display: flex;
   flex-direction: column;
-  padding: 2rem;
+  padding: 2.5rem;
   border-bottom: 1px dashed var(--primary);
 }
-/* kanan */
+
 #shikimori-screen {
   position: sticky;
-  top: 7vh;
+  top: 80px;
   right: 0;
   width: 60%;
-  height: 90vh;
-
+  height: calc(100vh - 80px);
   object-fit: cover;
-  object-position: center left;
-
   z-index: 2;
-  display: block;
+  background: #050505;
 }
 
 /* anime */
+.anime {
+  width: 100%;
+  justify-content: center;
+  padding: 20px 0;
+}
+
+.anime iframe {
+  width: 95%;
+  max-width: 1400px;
+  height: 100%;
+  min-height: 500px;
+  border: none;
+  display: block;
+  margin: 0 auto;
+  border-radius: 15px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
 
 .episode-section {
+  height: auto;
   display: flex;
   background-color: var(--bg-dark);
   gap: 40px;
@@ -217,7 +239,7 @@ h2 {
 .card-video {
   flex: 0 0 320px;
   background: var(--card-bg);
-  border-radius: 4px; 
+  border-radius: 4px;
   overflow: hidden;
   border: 1px solid #111;
   transition: all 0.3s ease;
@@ -316,12 +338,10 @@ h2 {
   margin-bottom: 12px;
 }
 
-
-
 /* --- AI SECTION CONTAINER --- */
 .ai-section {
   display: flex;
-  height: 600px; 
+  height: 600px;
   background: var(--bg-dark);
   border-top: 1px solid #111;
   overflow: hidden;
@@ -369,7 +389,9 @@ h2 {
   justify-content: center;
   align-items: center;
   z-index: 100;
-  transition: opacity 0.5s ease, visibility 0.5s;
+  transition:
+    opacity 0.5s ease,
+    visibility 0.5s;
 }
 
 .overlay-content {
@@ -402,7 +424,9 @@ h2 {
   text-align: center;
 }
 
-#initial-name:focus { border-color: var(--primary); }
+#initial-name:focus {
+  border-color: var(--primary);
+}
 
 #start-chat-btn {
   background: var(--primary);
@@ -457,11 +481,16 @@ h2 {
   scroll-behavior: smooth;
 }
 
-.chat-display::-webkit-scrollbar { width: 3px; }
-.chat-display::-webkit-scrollbar-thumb { background: var(--primary); }
+.chat-display::-webkit-scrollbar {
+  width: 3px;
+}
+.chat-display::-webkit-scrollbar-thumb {
+  background: var(--primary);
+}
 
 /* --- BUBBLE CHAT --- */
-.bot-msg, .user-msg {
+.bot-msg,
+.user-msg {
   max-width: 80%;
   padding: 12px 16px;
   font-size: 0.9rem;
@@ -501,22 +530,40 @@ h2 {
   background: rgba(157, 78, 221, 0.15);
 }
 
+/* Efek Sedih (Glowing Blue) */
+.bot-msg.sad-glow {
+  border-left: 3px solid #00d4ff;
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+  background: rgba(0, 212, 255, 0.1);
+}
+
 /* Animasi Getar (Shake) */
 @keyframes shake {
-  0% { transform: translate(1px, 1px) rotate(0deg); }
-  10% { transform: translate(-1px, -2px) rotate(-1deg); }
-  30% { transform: translate(3px, 2px) rotate(0deg); }
-  50% { transform: translate(-1px, 2px) rotate(1deg); }
-  70% { transform: translate(3px, 1px) rotate(-1deg); }
-  100% { transform: translate(1px, -2px) rotate(-1deg); }
+  0% {
+    transform: translate(1px, 1px) rotate(0deg);
+  }
+  10% {
+    transform: translate(-1px, -2px) rotate(-1deg);
+  }
+  30% {
+    transform: translate(3px, 2px) rotate(0deg);
+  }
+  50% {
+    transform: translate(-1px, 2px) rotate(1deg);
+  }
+  70% {
+    transform: translate(3px, 1px) rotate(-1deg);
+  }
+  100% {
+    transform: translate(1px, -2px) rotate(-1deg);
+  }
 }
 
 .shake-effect {
   animation: shake 0.4s;
   animation-iteration-count: 2;
 }
-
-/* --- ANIMASI HUJAN (UNTUK MOOD SEDIH) --- */
+/* hujan */
 .rain-container {
   position: absolute;
   top: 0;
@@ -538,17 +585,11 @@ h2 {
 }
 
 @keyframes fall {
-  to { transform: translateY(620px); }
+  to {
+    transform: translateY(620px);
+  }
 }
 
-/* Tambahkan warna glow biru untuk chat sedih */
-.bot-msg.sad-glow {
-  border-left: 3px solid #00d4ff;
-  box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
-  background: rgba(0, 212, 255, 0.1);
-}
-
-/* --- KONTROL INPUT --- */
 .chat-controls {
   padding: 20px;
   display: flex;
@@ -566,7 +607,9 @@ h2 {
   outline: none;
 }
 
-#user-input:focus { border-color: var(--primary); }
+#user-input:focus {
+  border-color: var(--primary);
+}
 
 #send-btn {
   background: var(--primary);
@@ -584,4 +627,285 @@ h2 {
 #send-btn:hover {
   transform: scale(1.05);
   box-shadow: 0 0 15px rgba(255, 136, 160, 0.4);
+}
+
+/* galeri */
+.gallery-section {
+  width: 100%;
+  padding: 40px 0;
+  background-color: #000;
+  text-align: center;
+  overflow: hidden;
+}
+
+.gallery-title {
+  color: #fff;
+  margin-bottom: 20px;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.pinterest-full-grid {
+  columns: 5;
+  column-gap: 15px;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  overflow-x: hidden; 
+}
+
+span[data-pin-log="embedBoard"] {
+  margin: 0 auto !important;
+  border: none !important;
+  max-width: 95% !important;
+}
+
+span[data-pin-log="embedBoard"] > span {
+  background: transparent !important;
+}
+
+
+/* Container Utama Footer */
+.main-footer {
+    background-color: #0b0b0b; /* Hitam pekat agar elegan */
+    color: #ffffff;
+    padding: 60px 0 20px 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    border-top: 2px solid #333; /* Garis tipis pembatas di atas */
+}
+
+/* Mengatur Grid 3 Kolom */
+.footer-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Membagi 3 kolom sama rata */
+    gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+
+/* Styling Link Navigasi */
+.footer-box ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-box ul li {
+    margin-bottom: 10px;
+}
+
+.footer-box ul li a {
+    color: #bbb;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.footer-box ul li a:hover {
+    color: #ff69b4;
+    padding-left: 5px;
+}
+
+/* Styling Sosial Media */
+.social-links {
+    display: flex;
+    flex-direction: column; /* Berderet ke bawah */
+    gap: 10px;
+}
+
+.socmed-item {
+    color: #bbb;
+    text-decoration: none;
+    background: #1a1a1a;
+    padding: 8px 15px;
+    border-radius: 5px;
+    transition: 0.3s;
+    text-align: center;
+    border: 1px solid #333;
+}
+
+.socmed-item:hover {
+    background: #ff69b4;
+    color: white;
+    border-color: #ff69b4;
+    transform: translateY(-3px);
+}
+
+/* Bagian Copyright di Bawah */
+.footer-bottom {
+    text-align: center;
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 1px solid #222;
+}
+
+.footer-bottom p {
+    color: #ffffff;
+    background-color: var(--primary);
+    height: 3rem;
+    font-size: 0.85rem;
+    justify-content: center;
+    display: flex;
+}
+
+/* Responsif: Jadi 1 kolom di HP */
+@media (max-width: 768px) {
+    .footer-container {
+        grid-template-columns: 1fr; /* Jadi satu deret ke bawah */
+        text-align: center;
+    }
+    
+    .social-links {
+        align-items: center;
+    }
+}
+
+
+
+/* laptop */
+@media (max-width: 1200px) {
+  .hero .content h1 {
+    font-size: 3rem;
+  }
+
+  .video-fixed {
+    flex: 0 0 55%;
+  }
+}
+
+/* tablet */
+@media (max-width: 991px) {
+  /* Navbar */
+  .navbar-collapse {
+    background: #111;
+    padding: 20px;
+    border: 1px solid var(--primary);
+    margin-top: 10px;
+  }
+
+  /* Hero */
+  .hero .content h1 {
+    font-size: 2.5rem;
+  }
+
+  /* Section Tentang */
+  .anim-wrapper {
+    flex-direction: column;
+    height: auto !important;
+  }
+
+  #shikimori-screen {
+    position: relative;
+    width: 100%;
+    height: 450px;
+    top: 0;
+    order: 1;
+  }
+
+  .content-left {
+    width: 100%;
+    order: 2;
+    padding-bottom: 50px;
+    box-shadow: none;
+  }
+
+  .content-left::after {
+    display: none;
+  }
+
+ /* anime */
+  .anime iframe {
+    min-height: 1000px;
+  }
+
+  .episode-section {
+    flex-direction: column;
+    gap: 20px;
+    padding: 15px;
+  }
+
+  .video-fixed {
+    width: 100%;
+    position: relative;
+    top: 0;
+  }
+
+  .video-slider {
+    width: 100%;
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 15px;
+    padding-bottom: 20px;
+  }
+
+  .card-video {
+    flex: 0 0 300px;
+  }
+
+  /* AI Section */
+  .ai-section {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .ai-image-side {
+    display: flex;
+    width: 100%;
+    height: 400px;
+  }
+
+  .ai-chat-side {
+    width: 100%;
+    height: 550px;
+    border-left: none;
+    border-top: 1px solid #222;
+  }
+
+  .shikimori-full-grid {
+    columns: 4; 
+  }
+}
+
+/* mobile */
+@media (max-width: 576px) {
+  /* Hero */
+  .hero .content h1 {
+    font-size: 2rem;
+  }
+
+  .hero .content p {
+    font-size: 0.85rem;
+  }
+
+  /* Canvas Tentang */
+  #shikimori-screen {
+    height: 300px;
+  }
+
+  /* Anime Section */
+  .anime iframe {
+    min-height: 800px;
+  }
+
+  .card-video {
+    flex: 0 0 260px; /* Kartu video lebih kecil */
+  }
+
+  /* Chat */
+  .bot-msg,
+  .user-msg {
+    max-width: 95%;
+    font-size: 0.85rem;
+  }
+
+  .text-section {
+    padding: 1.5rem;
+  }
+
+  .ai-image-side {
+    height: 300px;
+  }
+
+  .shikimori-full-grid {
+    columns: 3; 
+  }
 }
